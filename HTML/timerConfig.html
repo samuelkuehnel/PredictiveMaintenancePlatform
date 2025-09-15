@@ -1,0 +1,160 @@
+<br>
+<h4>Setup Timing</h4>
+<p>In this section you can setup the training duration and intervals when new samples are queried</p>
+<script type="text/javascript">
+    function toggleOptions() {
+        var switchElement = document.getElementById("switch");
+        var option1Element = document.getElementById("option1");
+        var option2Element = document.getElementById("option2");
+
+        // Show or hide elements based on the state of the switch
+        if (switchElement.checked) {
+            option2Element.style.margin = "0 auto";
+            option2Element.style.removeProperty('display');
+        } else {
+            option1Element.style.margin = "0 auto";
+            option2Element.style.display = "none";
+        }
+    }
+
+    function updateRepeat(repeat) {
+        var repeatValue = document.getElementById("repeatCount");
+        if (repeat.checked) {
+            repeatValue.setAttribute("disabled", "disabled");
+            repeatValue.value = -1;
+        } else {
+            repeatValue.removeAttribute("disabled");
+            repeatValue.value = null;
+        }
+    }
+</script>
+<!-- Table for standard timer configuration options -->
+<table id="option1" style="text-align:center;margin-left:auto; margin-right:auto;">
+    <colgroup>
+        <col>
+        <col>
+    </colgroup>
+    <!-- Input field for the interval between queries -->
+    <tr>
+        <td>Start Date: </td>
+        <td>
+            <input type="datetime-local" name="startDateTime" class="form-control" pattern="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"/>
+        </td>
+    </tr>
+    <tr>
+        <td>Duration (in days)</td>
+        <td>
+            <input name="duration" type="number" class="form-control"/>
+        </td>
+    </tr>
+    <br>
+    <tr>
+        <td>Interval: </td>
+        <td>
+            <input name="interval" type="number" class="form-control"/>
+        </td>
+    </tr>
+    <!-- Dropdown for selecting the time unit for the interval -->
+    <tr>
+        <td>Time unit: </td>
+        <td>
+            <select name="timeUnit" class="form-control">
+                <option value="0">Milliseconds</option>
+                <option value="1">Seconds</option>
+                <option value="2">Minutes</option>
+                <option value="3">Hours</option>
+                <option value="4">Days</option>
+            </select>
+        </td>
+    </tr>
+</table>
+<br>
+<!-- Table for toggling between standard and advanced timer configurations -->
+<table style="margin-left:auto; margin-right:auto;">
+    <tr>
+        <td>
+            <!-- Switch to toggle advanced configuration options -->
+            <div class="form-check form-switch" style="text-align: center;">
+                <input name="toggleAdvancedConfig" class="form-check-input" type="checkbox" id="switch" onchange="toggleOptions()">
+                <label class="form-check-label" for="switch">
+                    Toggle advanced config
+                </label>
+            </div>
+        </td>
+    </tr>
+</table>
+<br>
+
+<!-- Table for advanced timer configuration options, initially hidden -->
+<table id="option2" style="text-align:center;display: none;">
+    <colgroup>
+        <col>
+        <col>
+    </colgroup>
+    <!-- Options for selecting days of the week, visible if 'daily' is selected -->
+    <tr id="daySelection">
+        <td> Select Day(s)  </td>
+        <td>
+            <div id="daySelection">
+                <input class="form-check-input" name="Monday" type="checkbox" value="Monday" id="flexCheckDefault1" checked>
+                <label class="form-check-label" for="flexCheckDefault1">
+                    Monday
+                </label><br>
+                <input class="form-check-input" name="Tuesday" type="checkbox" value="Tuesday" id="flexCheckDefault2" checked>
+                <label class="form-check-label" for="flexCheckDefault2">
+                    Tuesday
+                </label><br>
+                <input class="form-check-input" name="Wednesday" type="checkbox" value="Wednesday" id="flexCheckDefault3" checked>
+                <label class="form-check-label" for="flexCheckDefault3">
+                    Wednesday
+                </label><br>
+                <input class="form-check-input" name="Thursday" type="checkbox" value="Thursday" id="flexCheckDefault4" checked>
+                <label class="form-check-label" for="flexCheckDefault4">
+                    Thursday
+                </label><br>
+                <input class="form-check-input" name="Friday" type="checkbox" value="Friday" id="flexCheckDefault5" checked>
+                <label class="form-check-label" for="flexCheckDefault5">
+                    Friday
+                </label><br>
+                <input class="form-check-input" name="Saturday" type="checkbox" value="Saturday" id="flexCheckDefault6" checked>
+                <label class="form-check-label" for="flexCheckDefault6">
+                    Saturday
+                </label><br>
+                <input class="form-check-input" name="Sunday" type="checkbox" value="Sunday" id="flexCheckDefault7" checked>
+                <label class="form-check-label" for="flexCheckDefault7">
+                    Sunday
+                </label><br>
+            </div>
+        </td>
+    </tr>
+    <!-- Options for periodic time configuration, visible if 'periodically' is selected -->
+    <tbody id="periodTimeConfig">
+        <tr>
+            <td>Start Time: </td>
+            <td>
+                <input name="startTime" type="time" class="form-control" value="00:00"/>
+            </td>
+        </tr>
+        <tr>
+            <td>End Time: </td>
+            <td>
+                <input name="endTime" type="time" class="form-control" value="23:59"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Repeat Count:
+            </td>
+            <td>
+                <input type="number" id="repeatCount" name="repeatCount" class="form-control" value="-1" disabled/>
+                <!-- Checkbox to indicate if the repeat count is infinite -->
+            </td>
+            <td> 
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input name="infiniteRepeat" class="form-check-input" type="checkbox" value="infinite" id="infiniteID" onclick="updateRepeat(this)" checked/>
+                <label class="form-check-label" for="infiniteID">
+                    Infinite
+                </label>
+            </td>
+        </tr>
+    </tbody>
+</table>

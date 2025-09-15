@@ -1,0 +1,282 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+        <title>Initiate Training </title>
+    </head>
+    <script>
+        window.addEventListener('keydown',function(e){if(e.keyIdentifier=='U+000A'||e.keyIdentifier=='Enter'||e.keyCode==13){if(e.target.nodeName=='INPUT'&&e.target.type=='text'){e.preventDefault();return false;}}},true);
+    </script>
+    <!-- Links to an external JavaScript file for handling form logic -->
+    <!--<script type="module" src="./constants.js"></script>-->
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="initiateTraining.js"></script>
+    <!-- Links to an external CSS file for custom styling -->
+    <link rel="stylesheet" href="./styles.css">
+    <body>
+        <form method="POST" action="$(INT:RESPONSE.URL)" enctype="multipart/form-data" name="MyFormular">
+            <input value="$(INT:RESPONSE.ID)" name="RESPONSE.ID" type="hidden"/>
+            <h1>Initiate Training</h1>
+            <br>
+            <table>
+                <!-- Dropdown for selecting a collection, triggers an event on change -->
+                <!-- <colgroup>
+                    <col>
+                    <col>
+                </colgroup> -->
+                <tr> 
+                    <td>Collection: </td>  
+                    <td>
+                        <select title="collectionID" id="collectionID" name="collectionID" class="form-control" onchange="queryCollectionData()"></select>
+                        <!-- <input placeholder="577691" id="collectionID" name="collectionID" onchange="queryCollectionData()" class="form-control" required/> -->
+                        <input type="hidden" id="structuredContainerId" name="structuredContainerId"/>
+                        <input type="hidden" id="fileContainerId" name="fileContainerId"/>
+                        <input type="hidden" id="timeseriesContainerId" name="timeseriesContainerId"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Data Source Type: </td>
+                    <td>
+                        <select title="dataSourceType" id="dataSourceType" name="dataSourceType" class="form-control" required onchange="dataSourceSelected(this.value)">
+                            <option>Choose Data Source Type</option>
+                            <option value="OPC UA">OPC UA</option>
+                            <option value="CSV">Manual CSV Upload</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Model Name: </td>
+                    <td>
+                        <input title="modelName" id="modelName" name="modelName" class="form-control" required/>
+                    </td>
+                </tr>
+            </table>
+            <script type="text/javascript"> 
+                jQuery(function(){
+                		jQuery("#CSV").load("./csvContent.html");
+                });
+            </script>
+            <div id="CSV" style="display:none"></div>
+            <div id="OPCUA" style="display: none;">
+                <p>Enter OPC UA specific values. If you don't need Authentication leave the input fields blank (Anonymous mode)</p>
+                <table>
+                    <!-- Input field for the OPC UA server hostname or IP -->
+                    <tr>
+                        <td>OPC UA Host (IP or hostname): </td>
+                        <td>
+                            <input title="opcUAServer" id="opcUAServer" name="opcUAServer" class="form-control"/>
+                        </td>
+                    </tr>
+                    <!-- Input field for the OPC UA server port -->
+                    <tr>
+                        <td>OPC UA Port: </td>
+                        <td>
+                            <input title="opcUAPort" id="opcUAPort" name="opcUAPort" class="form-control"/>
+                        </td>
+                    </tr>
+                    <!-- Dropdown for selecting the security mode, triggers an event on change -->
+                    <tr>
+                        <td>Authentication: </td>
+                        <td>
+                            <select title="securityMode" id="securityMode" name="securityMode" class="form-control" onchange="updateAuth()">
+                                <option>Anonymous</option>
+                                <option>User/Password</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <!-- Input field for entering the username for OPC UA authentication -->
+                    <tr>
+                        <td>Username:</td>
+                        <td>
+                            <input title="user_OPCUA" id="user_OPCUA" name="user_OPCUA" class="form-control" disabled/>
+                        </td>
+                    </tr>
+                    <!-- Input field for entering the password for OPC UA authentication -->
+                    <tr>
+                        <td>Password:</td>
+                        <td>
+                            <input title="password" type="password" id="password_OPCUA" name="password_OPCUA" class="form-control" disabled/>
+                        </td>
+                    </tr>
+                </table>
+                <br>
+                <h4>Variable Selection</h4>
+                    <p>In this table you can select the OpcUa variables to read and use for training and detection. <br/>
+                       You can enter variables by browsing them directly from the root object node (i=85) from your Opc Ua server, by uploading a CSV file containing the necessary node ids or by manually adding them.</p>
+                <div style="width:60%" class="container mt-5">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="BrowseOpcUa-tab" data-toggle="tab" href="#BrowseOpcUa" role="tab" aria-controls="BrowseOpcUa" aria-selected="true">Browse Variables</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="CsvUpload-tab" data-toggle="tab" href="#CsvUpload" role="tab" aria-controls="CsvUpload" aria-selected="false">Upload CSV</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="ManualUpload-tab" data-toggle="tab" href="#ManualUpload" role="tab" aria-controls="ManualUpload" aria-selected="false">Manual</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="BrowseOpcUa" role="tabpanel" aria-labelledby="BrowseOpcUa-tab">
+                            <br>
+                            <input style="width: 60%;margin-left:auto; margin-right:auto;" type="text" class="form-control" id="rootNodeOpcUa" placeholder="Enter root node id (e.g. i=85)" value="i=85"/>
+                            <br>
+                            <button type="button" id="browseVarsButton" class="btn btn-primary" onclick="browseVariablesOPCUA(document.getElementById('rootNodeOpcUa'))">Browse all variables from root onject node</button>
+                            <br>
+                            <br>
+                            <image id="loadingGif" src="./Circles-menu-3.gif" style="display: none; width: 50px; height: 50px;"/>
+                        </div>
+                        <div class="tab-pane fade" id="CsvUpload" role="tabpanel" aria-labelledby="CsvUpload-tab">
+                            <br>
+                            <input style="width: 40%;margin-left:auto; margin-right:auto;" type="file" id="csvFile" name="csvFile" accept=".csv"/>
+                            <button type="button" id="uploadCSVButton" class="btn btn-primary" onchange="uploadCSV()">Upload</button>
+                        </div>
+                        <div class="tab-pane fade" id="ManualUpload" role="tabpanel" aria-labelledby="ManualUpload-tab">
+                            <br>
+                            <table style="margin-left:auto; margin-right:auto;">
+                                <tr>
+                                    <th>Node ID</th>
+                                    <th>Variable Name (optional)</th>
+                                    <th>Data Type (optional)</th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input id="nodeId_manually" class="form-control"/>
+                                    </td>
+                                    <td>
+                                        <input id="variableName_manually" class="form-control"/>
+                                    </td>
+                                    <td>
+                                        <input id="dataType_manually" class="form-control"/>
+                                    </td>
+                                    <td>
+                                        <button type="button" id="addManuallyButton" class="btn btn-primary" onclick="addManually()">Add</button>
+                                    </td>
+                                </tr>
+                            </table>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <details>
+                       <summary>
+                      <b>Variables</b>
+                      <input type="text" id="searchInput" placeholder="Suche nach Namen.." onchange="filterTable()" />
+                    </summary>
+                    <br>
+                    <button type="button" id="selectVars" class="btn btn-primary" onclick="applyFilteredCheckboxes(true)">Select</button>
+                    <button type="button" id="unselectVars"class="btn btn-primary" onclick="applyFilteredCheckboxes(false)">Unselect</button>
+                    <button type="button" id="clearTable" class="btn btn-primary" onclick="clearTable(document.getElementById('variableBody'))">clearTable</button>
+                    <br>
+                    <br>
+                    <div>
+                        <table class="table" style="width:60%; margin-left:auto; margin-right:auto;" id="selectedVariables">
+                            <thead>
+                                <tr>
+                                    <th>Variable Name</th>
+                                    <th>Node ID</th>
+                                    <th>Data Type</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="variableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+            </div>
+            <!-- Container for timer configuration, initially hidden -->
+            
+            <div id="TrainingEnvironment" style="display: none;">
+                <br>
+                <h4>Training Environment</h4>
+                <p>In this section you can setup the parameters to setup the training environment for your anomaly detection model.</p>
+                <table style="margin-left:auto; margin-right:auto;">
+                    <tr>
+                        <td>Model Type:</td>
+                        <td>
+                            <select id="AUTOENCODER_TYPE" name="AUTOENCODER_TYPE" class="form-control" required onchange="modelTypeSelected(this.value);">
+                                <option value="Choose Model Type">Choose Model Type</option>
+                                <option value="standard">Standard Autoencoder</option>
+                                <option value="lstm">RNN Autoencoer (LSTM)</option>
+                                <option value="attention">Attention Autoencoder</option>
+                                <option value="conv">Convolutional Autoencoder</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Buffer Size:</td>
+                        <td>
+                            <input id="BUFFER_SIZE" name="BUFFER_SIZE" class="form-control" type="number"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Epochs: </td>
+                        <td>
+                            <input id="EPOCHS" name="EPOCHS" class="form-control" type="number"/> 
+                        </td>
+                    </tr>
+                    <tr id="bufferModeRow">
+                        <td>Buffer Mode</td>
+                        <td>
+                            <select id="BUFFER_MODE" name="BUFFER_MODE" class="form-control">
+                                <option>Choose Buffer Mode</option>
+                                <option>replace</option>
+                                <option>append</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Dropout Rate:
+                        </td>
+                        <td>
+                            <input step="0.01" id="DROPOUT_RATE" name="DROPOUT_RATE" class="form-control" type="number"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            L2 Regression Rate:
+                        </td>
+                        <td>
+                            <input step="0.0001" id="L2_LAMBDA" name="L2_LAMBDA" class="form-control" type="number"/>
+                        </td>
+                    </tr>
+                    <tbody id="rnnAutoencoderParams" style="display: none;">
+                        <tr>
+                            <td>
+                                Sequence Length:
+                            </td>
+                            <td>
+                                <input id="SEQUENCE_LENGTH" name="SEQUENCE_LENGTH" class="form-control" type="number"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <script type="text/javascript"> 
+                jQuery(function(){
+                		jQuery("#handleInvalidData").load("./exceptionHandling.html");
+                });
+            </script>
+            <div id="handleInvalidData" style="width:60%;margin-left:auto; margin-right:auto;display:none"></div>
+            <script type="text/javascript"> 
+                jQuery(function(){
+                		jQuery("#timerConfigDiv").load("./timerConfig.html");
+                });
+            </script>
+            <div id="timerConfigDiv" style="display: none;"></div>
+            <br>
+            <button value="SUBMIT" formmethod="post" type="submit" name="SUBMIT" class="btn btn-success">Submit</button>
+        </form>
+    </body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+        <title>Initiate Detection </title>
+    </head>
+    <script>
+        window.addEventListener('keydown',function(e){if(e.keyIdentifier=='U+000A'||e.keyIdentifier=='Enter'||e.keyCode==13){if(e.target.nodeName=='INPUT'&&e.target.type=='text'){e.preventDefault();return false;}}},true);
+    </script>
+    <!-- Links to an external JavaScript file for handling form logic -->
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="initiateDetection.js"></script>
+    <!-- Links to an external CSS file for custom styling -->
+    <link rel="stylesheet" href="styles.css">
+
+    <body style="text-align:center">
+        <form method="POST" action="$(INT:RESPONSE.URL)" enctype="multipart/form-data" name="MyFormular">
+            <input value="$(INT:RESPONSE.ID)" name="RESPONSE.ID" type="hidden"/>
+            <h1>Initiate Detection</h1>
+            <br>
+            <table style="margin-left:auto; margin-right:auto;">
+                <!-- Dropdown for selecting a collection, triggers an event on change -->
+                <!-- <colgroup>
+                    <col>
+                    <col>
+                </colgroup> -->
+                <tr>   
+                    <td>Collection: </td>
+                    <td>
+                        <select id="collectionID" name="collectionID" class="form-control" onchange="queryCollectionData()"></select>
+                        <input type="hidden" id="structuredContainerId" name="structuredContainerId"/>
+                        <input type="hidden" id="fileContainerId" name="fileContainerId"/>
+                        <input type="hidden" id="timeseriesContainerId" name="timeseriesContainerId"/>
+                        <input type="hidden" id="structDataModelOid" name="structDataModelOid"/>
+                        <input type="hidden" id="structDataScenarioOid" name="structDataScenarioOid"/>
+                        <!-- <input placeholder="577691" id="collectionID" name="collectionID" onchange="queryCollectionData()" class="form-control" required/> -->
+                    </td>
+                </tr>
+                <tr>
+                    <td>Process Name: </td>
+                    <td>
+                        <input id="modelName" name="modelName" class="form-control" required/>
+                        <input id="modelVersion" name="modelVersion" class="form-control" type="hidden"/>
+                    </td>
+                </tr>
+            </table>
+            <div id="dataObjects" style="display:none">
+                <br>
+                <h4>Select trained Model</h4>
+                    <p>In this table you can select your trained model to detect anomalies.</p>  
+                <br>
+                    <select style="width: 40%;margin-left:auto; margin-right:auto;" id="modelSelection" class="form-control" onchange="updateSelectedModelData(this)"></select>
+                    <br>
+                    <div>
+                        <table class="table" style="width:80%; margin-left:auto; margin-right:auto;" id="selectedVariables">
+                            <thead>
+                                <tr>
+                                    <th>Data Object Name</th>
+                                    <th>Created</th>
+                                    <th>Model Type</th>
+                                    <th>Validation Performance</th>
+                                    <th>Recommended Detection Threshold</th>
+                                </tr>
+                            </thead>
+                            <tr id="dataRowSelectedModel">
+                                <td>
+                                    <input type="text" id="dataObjectName" name="dataObjectName" class="form-control" />
+                                    <input type="hidden" id="dataObjectID" name="dataObjectID" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" id="created" name="created" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" id="modelType" name="modelType" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" id="validationPerformance" name="validationPerformance" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" id="recommendedDetectionThreshold" name="recommendedDetectionThreshold" class="form-control" />
+                                </td>
+                            </tr>
+                        </table>
+                        <input type="hidden" id="dataSourceType" name="dataSourceType"/>
+                        <script type="text/javascript"> 
+                            jQuery(function(){
+                                    jQuery("#CSV").load("./csvContent.html");
+                            });
+                        </script>
+                        <div id="CSV" style="display:none"></div>
+                        <table id="OPCUA" style="margin-left:auto; margin-right:auto; display: none;">
+                            <!-- Input field for the OPC UA server hostname or IP -->
+                            <tr>
+                                <td>NodeIds: </td>
+                                <td>
+                                    <textarea id="nodeIds" name="nodeIds" cols="70"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Count NodeIds: </td>
+                                <td>
+                                    <input id="numFeatures" name="numFeatures" class="form-control"/>
+                                </td>
+                            </tr>
+                            <!-- Input field for the OPC UA server port -->
+                            <tr>
+                                <td>OPC URI: </td>
+                                <td>
+                                    <input id="opcUaUri" name="opcUaUri" class="form-control"/>
+                                </td>
+                            </tr>
+                            <!-- Dropdown for selecting the security mode, triggers an event on change -->
+                            <tr>
+                                <td>Authentication: </td>
+                                <td>
+                                    <select id="securityMode" name="securityMode" class="form-control" onchange="updateAuth()">
+                                        <option>Anonymous</option>
+                                        <option>User/Password</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <!-- Input field for entering the username for OPC UA authentication -->
+                            <tr>
+                                <td>Username:</td>
+                                <td>
+                                    <input id="user_OPCUA" name="user_OPCUA" class="form-control" disabled/>
+                                </td>
+                            </tr>
+                            <!-- Input field for entering the password for OPC UA authentication -->
+                            <tr>
+                                <td>Password:</td>
+                                <td>
+                                    <input type="password" id="password_OPCUA" name="password_OPCUA" class="form-control" disabled/>
+                                </td>
+                            </tr>
+                        </table>
+                        
+                    </div>
+            </div>
+            <!-- Container for timer configuration, initially hidden -->
+            
+            <div id="TrainingEnvironment" style="display: none;">
+                <br>
+                <h4>Detection Environment</h4>
+                <p>In this section you can setup the parameters to setup the detection environment for your anomaly detection model.</p>
+                <br>
+                <p>Below yu can select the threshold used to classify normal or anomalous behavior:</p>
+                <details>
+                    <canvas id="lossChart" style="width:100%;max-width:700px; margin-left:auto; margin-right:auto;"></canvas>
+
+                    <table style="margin-left:auto; margin-right:auto;">
+                        
+                    </table>
+                </details>
+                <table style="margin-left:auto; margin-right:auto;">
+                    <tr>
+                        <td>Select threshold method:</td>
+                        <td>
+                            <select id="THRESHOLD_METHOD" name="THRESHOLD_METHOD" class="form-control" required onchange="thresholdMethodSelected(this.value)">
+                                <option value="Choose Threshold Method">Choose Threshold Method</option>
+                                <option value="max">Max</option>
+                                <option value="percentile">Percentile</option>
+                                <option value="mean_stds">Mean + n x Stds</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr id="percentileRow" style="display: none;">
+                        <td>Percentile:</td>
+                        <td>
+                            <input step="0.01" id="PERCENTILE" name="PERCENTILE" class="form-control" type="number" onchange="calculateQuantile(this.value)"/>
+                        </td>
+                    </tr>
+                    <tr id="stdsRow" style="display: none;">
+                        <td>Number of standard deviations:</td>
+                        <td>
+                            <input step="1" id="STDS" name="STDS" class="form-control" type="number" onchange="caluclateMeanAndStds(this.value)"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Detection Threshold</td>
+                        <td>
+                            <input step="0.01" id="DETECTION_THRESHOLD" name="DETECTION_THRESHOLD" class="form-control" type="number" readonly onchange="plot_losses(this.value)"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Detection Buffer Length</td>
+                        <td>
+                            <input id="DETECTION_BUFFER_LENGTH" name="DETECTION_BUFFER_LENGTH" class="form-control" type="number"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Detection Buffer Mode</td>
+                        <td>
+                            <select id="DETECTION_BUFFER_MODE" name="DETECTION_BUFFER_MODE" class="form-control">
+                                <option>Choose Buffer Mode</option>
+                                <option>replace</option>
+                                <option>append</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Continue Training during Detection?
+                        </td>
+                        <td>
+                            <input type="checkbox" id="CONTINUE_TRAINING" name="CONTINUE_TRAINING" class="form-check form-switch" onchange="updateRetrainingParams(this)"/>
+                        </td>
+                    </tr>
+                    <tbody id="retrainingParams" style="display: none;">
+                        <tr>
+                            <td>Include anomalies detected by the model <br> into the training data?</td>
+                            <td>
+                                <input type="checkbox" id="INCLUDE_ANOMALIES" name="INCLUDE_ANOMALIES" class="form-check form-switch"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Buffer Size:</td>
+                            <td>
+                                <input id="BUFFER_SIZE" name="BUFFER_SIZE" class="form-control" type="number"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Epochs: </td>
+                            <td>
+                                <input id="EPOCHS" name="EPOCHS" class="form-control" type="number"/> 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Batch Size:
+                            </td>
+                            <td>
+                                <input id="BATCH_SIZE" name="BATCH_SIZE" class="form-control" type="number"/>
+                            </td>
+                        </tr>
+                        <tr id="bufferModeRow">
+                            <td>Buffer Mode</td>
+                            <td>
+                                <select id="BUFFER_MODE" name="BUFFER_MODE" class="form-control">
+                                    <option>Choose Buffer Mode</option>
+                                    <option>replace</option>
+                                    <option>append</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody id="rnnAutoencoderParams" style="display: none;">
+                        <tr>
+                            <td>
+                                Sequence Length:
+                            </td>
+                            <td>
+                                <input id="SEQUENCE_LENGTH" name="SEQUENCE_LENGTH" class="form-control" type="number"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <script type="text/javascript"> 
+                jQuery(function(){
+                		jQuery("#handleInvalidData").load("./exceptionHandling.html");
+                });
+            </script>
+            <div id="handleInvalidData" style="width:60%;margin-left:auto; margin-right:auto;display:none"></div>
+            
+             <script type="text/javascript"> 
+                jQuery(function(){
+                		jQuery("#timerConfigDiv").load("./timerConfig.html");
+                });
+            </script>
+            <div id="timerConfigDiv" style="display: none;"></div>
+            <br>
+            <button value="SUBMIT" formmethod="post" type="submit" name="SUBMIT" class="btn btn-success">Submit</button>
+        </form>
+    </body>

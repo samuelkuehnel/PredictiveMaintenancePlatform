@@ -3,6 +3,21 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Ignore the "document" folder
+document/
+
+# Ignore the "JavaWebsocket" folder
+JavaWebsocket/
+
+# Ignore the "kafka" folder
+kafka/
+
+# Ignore all .pem files
+*.pem
+
+# Ignore all .png files
+*.png
+
 # C extensions
 *.so
 

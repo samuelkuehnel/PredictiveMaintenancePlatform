@@ -1,0 +1,2 @@
+Colums: selected columns:  ['ns_4_s_AirConditioner_7_Temperature'
+ 'ns_4_s_AirConditioner_6_Temperature']

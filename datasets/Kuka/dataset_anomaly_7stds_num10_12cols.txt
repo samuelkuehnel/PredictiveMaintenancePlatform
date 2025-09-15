@@ -1,0 +1,5 @@
+selected columns:  ['Istwert Moment Achse2 M_a2 / Nm' 'Istposition TCP Y / mm'
+ 'Istwert Moment Achse3 M_a3 / Nm' 'Parameter37 / ' 'Parameter21 / '
+ 'Parameter19 / ' 'Istwert Moment Achse1 M_a1 / Nm' 'Parameter24 / '
+ 'Istwert Spindelstrom I_sp / A' 'Istorientierung TCP B / °'
+ 'Istwert Moment Achse4 M_a4 / Nm' 'Istwert Spindeldrehzahl n_sp / U/min'] 

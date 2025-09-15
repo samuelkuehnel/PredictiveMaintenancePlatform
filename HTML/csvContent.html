@@ -1,0 +1,19 @@
+<script type="text/javascript" src="csvContent.js"></script>
+
+<p>Upload a CSV file containing the data you want to use for training and detection</p>
+<input type="file" id="csvFileTraining" name="csvFileTraining" onchange="readCSVFile(this)" accept=".csv"/>
+<br>
+<input type="checkbox" id="headerCheckbox" name="headerCheckbox" value="true" checked/>
+<label for="headerCheckbox">Header present</label><br>
+<input type="hidden" id="csvTextContent" name="csvTextContent"/>
+<input type="hidden" id="columnCount" name="columnCount"/>
+<input type="hidden" id="headers" name="headers"/>
+<br>
+<br>
+<!-- Accordion for displaying additional options or details related to data preview -->
+<h4>Data Preview</h4>
+<br>
+<div id="csv_content" style="width:70%;margin-left:auto; margin-right:auto;">
+    
+    <!-- Items will be dynamically added here -->
+</div>    

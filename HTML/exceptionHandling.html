@@ -1,0 +1,87 @@
+<br>
+<h4>Handle Invalid Data</h4>
+<p>In this section you can setup the parameters to handle invalid data in your training environment.
+    You can select a default method to handle invalid data and then specify futher exceptions for specific variables.</p>
+<script src="./exceptionHandling.js" type="module"></script>
+<table style="margin-left:auto; margin-right:auto;">
+    <tr>
+        <td>Default Data Handling:</td>
+        <td>
+            <select id="INVALID_DATA_HANDLING" name="INVALID_DATA_HANDLING" class="form-control" required>
+                <option value="Choose Invalid Data Handling">Choose Data Handling</option>
+                <option value="remove">Remove</option>
+                <option value="custom">Custom replacement value</option>
+                <option value="fowardfill">Forward Fill</option>
+                <option value="mean">Mean</option>
+            </select>
+        </td>
+    </tr>
+    <tr id="replaceInvalidData" style="display: none;">
+        <td>Default Value:</td>
+        <td>
+            <input id="REPLACE_VALUE" name="REPLACE_VALUE" class="form-control" type="number"/>
+        </td>
+    </tr>
+</table>
+<br>
+<details>
+    <summary>
+        Detailed Data handling specifications
+    </summary>
+    <div>
+        <table style="width:60%; margin-left:auto; margin-right:auto;">
+            <tr>
+                <td>
+                    Select variable or value:
+                </td>
+                <td>
+                    <datalist id="variableOptions"></datalist>
+                    <input list="variableOptions" id="variableSelection" name="variableSelection" class="form-control" placeholder="Select or enter a variable">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Select Method:
+                </td>
+                <td>
+                    <select id="INVALID_DATA_HANDLING_EXCEPTION" class="form-control" required>
+                        <option value="Choose Invalid Data Handling">Choose Data Handling</option>
+                        <option value="remove">Remove</option>
+                        <option value="custom">Custom replacement value</option>
+                        <option value="fowardfill">Forward Fill</option>
+                        <option value="mean">Mean</option>
+                    </select>
+                </td>
+                
+            </tr>
+            <tr id="replaceInvalidDataException" style="display: none;">
+                <td>
+                    Default Value:
+                </td>
+                <td >
+                    <input id="REPLACE_VALUE_EXCEPTION" name="REPLACE_VALUE_EXCEPTION" class="form-control" type="number"/>
+                </td>
+            </tr>
+            <tr>    
+                <td></td>
+                <td>
+                    <button id="addRowButton" type="button" class="btn btn-primary">Add</button>
+                </td>
+            </tr>
+
+        </table>
+        <br>
+        <table style="width:60%; margin-left:auto; margin-right:auto;" id="detailedDataHandling">
+            <thead>
+                <tr>
+                    <th>Variable Name</th>
+                    <th>Method</th>
+                    <th>Replace value (optional)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="variableBodyExceptions">
+            </tbody>
+        </table>
+    </div>
+</details>
